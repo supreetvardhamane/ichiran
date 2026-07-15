@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>番組帳 · Anime Log</title>
+  <meta name="description" content="Track anime you've watched, are watching, and will watch." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700;800&family=Shippori+Mincho:wght@500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>桜</text></svg>" />
+</head>
+<body>
+  <div class="page-bg" aria-hidden="true">
+    <div class="night-sky"></div>
+    <div class="sakura-layer" id="sakuraLayer"></div>
+  </div>
+
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="logo" href="#" id="logoHome">
+        <span class="logo-kanji">番</span>
+        <span class="logo-text">
+          <strong>Anime Log</strong>
+          <small>番組帳 · my watchlist</small>
+        </span>
+      </a>
+
+      <nav class="top-nav" aria-label="Primary">
+        <button type="button" class="nav-pill active" data-filter="all">All</button>
+        <button type="button" class="nav-pill" data-filter="watching">
+          <span class="jp">視聴中</span> Watching
+        </button>
+        <button type="button" class="nav-pill" data-filter="completed">
+          <span class="jp">完了</span> Done
+        </button>
+        <button type="button" class="nav-pill" data-filter="planned">
+          <span class="jp">見たい</span> Queue
+        </button>
+      </nav>
+
+      <div class="top-actions">
+        <button type="button" class="btn btn-outline" id="importListBtn" title="Import MAL / AniList / CSV / JSON">
+          Import
+        </button>
+        <button type="button" class="btn btn-outline" id="exportBtn" title="Export backup">
+          Export
+        </button>
+        <button type="button" class="btn btn-accent" id="addAnimeBtn">
+          ＋ Add Anime
+        </button>
+        <div class="settings-wrap">
+          <button type="button" class="x-btn" id="settingsBtn" title="More options" aria-haspopup="true" aria-expanded="false">⚙</button>
+          <div class="menu-dropdown hidden" id="settingsMenu" role="menu">
+            <button type="button" class="menu-item" id="fetchCoversBtn" role="menuitem">🖼 Fetch missing covers</button>
+            <button type="button" class="menu-item danger" id="clearDataBtn" role="menuitem">🗑 Clear all data</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="shell">
+    <section class="hero-strip">
+      <div class="hero-copy">
+        <p class="hero-kicker">あなたのアニメリスト</p>
+        <h1>What are you watching?</h1>
+        <p class="hero-sub">Track completed series, current episodes, and your plan-to-watch pile — all in one place.</p>
+      </div>
+      <div class="hero-stats" id="stats">
+        <div class="hstat watching">
+          <span class="hstat-num" id="statWatching">0</span>
+          <span class="hstat-label">視聴中<br>Watching</span>
+        </div>
+        <div class="hstat completed">
+          <span class="hstat-num" id="statCompleted">0</span>
+          <span class="hstat-label">完了<br>Done</span>
+        </div>
+        <div class="hstat planned">
+          <span class="hstat-num" id="statPlanned">0</span>
+          <span class="hstat-label">見たい<br>Queue</span>
+        </div>
+        <div class="hstat total">
+          <span class="hstat-num" id="statTotal">0</span>
+          <span class="hstat-label">合計<br>Total</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="controls">
+      <div class="search-box">
+        <span class="search-ico" aria-hidden="true">⌕</span>
+        <input type="search" id="searchInput" placeholder="Search title, genre, notes…" autocomplete="off" />
+      </div>
+      <label class="sort-box">
+        <span>Sort</span>
+        <select id="sortSelect">
+          <option value="updated">Recently updated</option>
+          <option value="title">Title A–Z</option>
+          <option value="rating">Highest rated</option>
+          <option value="added">Date added</option>
+        </select>
+      </label>
+      <button type="button" class="btn btn-outline" id="pickRandomBtn" title="Pick something from your queue">🎲 Pick something</button>
+    </section>
+
+    <section class="board" id="board"></section>
+    <p class="empty-state hidden" id="emptyGlobal"></p>
+  </main>
+
+  <footer class="site-footer">
+    <span>番組帳 · saved locally in this browser, never uploaded anywhere</span>
+  </footer>
+
+  <!-- Add / Edit -->
+  <div class="modal-root hidden" id="modalOverlay" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal sheet">
+      <header class="modal-head">
+        <div>
+          <p class="modal-kicker" id="modalKicker">新規追加</p>
+          <h2 id="modalTitle">Add Anime</h2>
+        </div>
+        <button type="button" class="x-btn" id="closeModal" aria-label="Close">×</button>
+      </header>
+
+      <form id="animeForm" class="modal-body" novalidate>
+        <input type="hidden" id="animeId" value="" />
+
+        <div class="field search-field">
+          <label for="title">Title <em>*</em></label>
+          <input type="text" id="title" name="title" required maxlength="160" placeholder="Type a title — search MyAnimeList…" autocomplete="off" />
+          <div class="search-results hidden" id="searchResults" role="listbox"></div>
+          <p class="field-hint">Pick a result to auto-fill cover, episodes & genres — or type your own.</p>
+        </div>
+
+        <div class="grid-2">
+          <div class="field">
+            <label for="status">Status</label>
+            <select id="status" name="status">
+              <option value="watching">視聴中 · Watching</option>
+              <option value="completed">完了 · Completed</option>
+              <option value="planned">見たい · Plan to Watch</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="rating">Your score</label>
+            <select id="rating" name="rating">
+              <option value="">—</option>
+              <option value="10">10 ★ Masterpiece</option>
+              <option value="9">9 ★ Amazing</option>
+              <option value="8">8 ★ Great</option>
+              <option value="7">7 ★ Good</option>
+              <option value="6">6 ★ Fine</option>
+              <option value="5">5 ★ Average</option>
+              <option value="4">4 ★ Bad</option>
+              <option value="3">3 ★ Terrible</option>
+              <option value="2">2 ★ Horrible</option>
+              <option value="1">1 ★ Appalling</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="field">
+            <label for="episodesWatched">Episodes watched</label>
+            <input type="number" id="episodesWatched" name="episodesWatched" min="0" max="9999" placeholder="0" />
+          </div>
+          <div class="field">
+            <label for="episodesTotal">Total episodes</label>
+            <input type="number" id="episodesTotal" name="episodesTotal" min="0" max="9999" placeholder="24" />
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="genres">Genres</label>
+          <input type="text" id="genres" name="genres" maxlength="220" placeholder="Action, Drama, Sci-Fi" />
+        </div>
+
+        <div class="field">
+          <label for="coverUrl">Cover image URL</label>
+          <input type="text" id="coverUrl" name="coverUrl" maxlength="800" placeholder="Filled from MAL when possible" />
+        </div>
+
+        <div class="field">
+          <label for="notes">Notes</label>
+          <textarea id="notes" name="notes" rows="3" maxlength="600" placeholder="Thoughts, where you left off…"></textarea>
+        </div>
+
+        <footer class="modal-foot">
+          <button type="button" class="btn btn-outline" id="cancelModal">Cancel</button>
+          <button type="submit" class="btn btn-accent" id="saveAnimeBtn">Save to list</button>
+        </footer>
+      </form>
+    </div>
+  </div>
+
+  <!-- Import -->
+  <div class="modal-root hidden" id="importOverlay" role="dialog" aria-modal="true" aria-labelledby="importTitle">
+    <div class="modal sheet wide">
+      <header class="modal-head">
+        <div>
+          <p class="modal-kicker">リスト取り込み</p>
+          <h2 id="importTitle">Import your anime list</h2>
+        </div>
+        <button type="button" class="x-btn" id="closeImport" aria-label="Close">×</button>
+      </header>
+
+      <div class="modal-body import-body">
+        <div class="import-options">
+          <label class="import-card">
+            <input type="radio" name="importMode" value="merge" checked />
+            <span class="import-card-ui">
+              <strong>Merge</strong>
+              <small>Keep existing entries. Skip duplicates by title.</small>
+            </span>
+          </label>
+          <label class="import-card">
+            <input type="radio" name="importMode" value="replace" />
+            <span class="import-card-ui">
+              <strong>Replace all</strong>
+              <small>Wipe current list and load the file.</small>
+            </span>
+          </label>
+        </div>
+
+        <div class="dropzone" id="dropzone">
+          <input type="file" id="importFile" accept=".xml,.json,.csv,.txt,text/xml,application/json,text/csv" hidden />
+          <div class="dropzone-inner">
+            <span class="drop-icon">📁</span>
+            <p><strong>Drop a file here</strong> or <button type="button" class="linkish" id="browseImportBtn">browse</button></p>
+            <p class="drop-formats">Supports MAL XML · AniList JSON · CSV · Anime Log JSON — covers fetch automatically after import.</p>
+          </div>
+        </div>
+
+        <div class="import-help">
+          <details>
+            <summary>Don't have a file yet? Export from MyAnimeList</summary>
+            <ol>
+              <li>Go to <a href="https://myanimelist.net/panel.php?go=export" target="_blank" rel="noopener">MAL → Export</a></li>
+              <li>Export Anime List → download the XML file</li>
+              <li>Drop it above</li>
+            </ol>
+          </details>
+        </div>
+
+        <p class="import-status hidden" id="importStatus"></p>
+      </div>
+    </div>
+  </div>
+
+  <button type="button" class="fab-add" id="fabAddBtn" aria-label="Add anime">＋</button>
+
+  <div class="cover-progress hidden" id="coverProgress" role="status">
+    <div class="cover-progress-bar"><i id="coverProgressFill"></i></div>
+    <p id="coverProgressText">Fetching covers…</p>
+  </div>
+
+  <div class="toast hidden" id="toast" role="status"></div>
+  <script src="app.js"></script>
+</body>
+</html>
