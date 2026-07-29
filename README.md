@@ -1,62 +1,131 @@
-# 桜 Ichiran — 番組帳
+# 🌸 桜 Ichiran (一覧)
 
-A calm, minimal watchlist for anime you're watching, have finished, and plan to watch. Named after *ichiran* (一覧) — "an overview, a list at a glance."
+> **A calm, minimal anime watchlist that lives entirely in your browser.**
 
-Everything lives in your browser. No account, no server, no tracking — your list is yours.
+**Ichiran** (一覧) is a lightweight anime tracker for keeping up with what you're watching, what you've finished, and what you want to watch next. Built with plain HTML, CSS and JavaScript, it focuses on simplicity, speed and privacy—no accounts, no backend and no unnecessary clutter.
 
-![status](https://img.shields.io/badge/status-active-brightgreen) ![license](https://img.shields.io/badge/license-MIT-blue)
+Everything is stored locally in your browser, so your watchlist stays yours.
 
-## Features
 
-- **Three-column board** — Watching / Completed / Plan to Watch, with live counts and progress bars per entry
-- **MyAnimeList-powered search** — start typing a title and pull in cover art, episode count, and genres automatically
-- **Import** from MyAnimeList XML export, AniList JSON export, CSV, or a Cour JSON backup
-- **Export** your whole list as a JSON backup any time
-- **Favorites** — pin the shows you care about most to the top of their column
-- **Undo-able delete** — remove an entry with one tap, undo it for a few seconds after
-- **"Pick something" button** — can't decide what to start next? Get a random pick from your queue
-- **Fetch missing covers** — backfill poster art for anything imported without one
-- **Fully responsive** — same experience on desktop and phone
-- **Sort and search** across title, genre, and notes
+## ✨ Features
 
-## Running it locally
+* 🎬 **Three-column watchlist** — Organise anime into **Watching**, **Completed**, and **Plan to Watch**
+* 📊 **Progress tracking** — Episode progress bars and live counters
+* 🔍 **Smart anime search** — Search directly from **MyAnimeList** using the Jikan API
+* 🖼️ **Automatic cover art** — Fetch posters, genres and episode counts instantly
+* 📥 **Import existing lists**
+
+  * MyAnimeList (XML)
+  * AniList (JSON)
+  * CSV
+  * Cour JSON backups
+* 📤 **Export backups** — Download your complete watchlist as JSON anytime
+* ⭐ **Favorites** — Pin your favourite anime to the top
+* ↩️ **Undo delete** — Accidentally removed something? Restore it within a few seconds
+* 🎲 **Random picker** — Can't decide what to watch? Let Ichiran choose from your queue
+* 🖼️ **Fetch missing covers** after importing
+* 📱 **Responsive design** for desktop and mobile
+* 🔎 **Search & filter** by title, genre and notes
+
+
+## 🚀 Running Locally
+
+Clone the repository
 
 ```bash
-git clone https://github.com/<your-username>/cour.git
-cd cour
+git clone https://github.com/supreetvardhamane/ichiran.git
+```
+
+Move into the project
+
+```bash
+cd ichiran
+```
+
+Start a local server
+
+```bash
 python3 -m http.server 8080
 ```
 
-Open **http://localhost:8080** — a local server is required so cover art can load correctly (opening `index.html` directly from disk will block the API requests).
+Then open:
 
-## Importing your existing list
+```
+http://localhost:8080
+```
 
-**From MyAnimeList:**
-1. Go to [MAL → Export](https://myanimelist.net/panel.php?go=export)
+> **Note:** A local server is required because browsers block some API requests when opening `index.html` directly from the file system.
+
+
+## 📥 Import Your Existing Library
+
+Ichiran supports importing from multiple sources.
+
+### 📺 MyAnimeList
+
+1. Go to **MyAnimeList → Export**
 2. Export your anime list as XML
-3. Drop the file into Cour's Import modal — covers fetch automatically afterward
+3. Import it into Ichiran
+4. Covers will be fetched automatically
 
-**From AniList:** export your list as JSON from AniList's settings, then import the same way.
+### 📚 AniList
 
-**From a spreadsheet:** import a CSV with columns for title, status, score, episodes, and genres.
+Export your library as **JSON** from AniList settings and import it into Ichiran.
 
-If some posters don't load automatically after import, use **Fetch missing covers** from the settings (⚙) menu.
+### 📄 CSV
 
-## Data & privacy
+Import spreadsheets containing:
 
-Your list is stored entirely in this browser's `localStorage` under a single key — nothing is sent anywhere except:
-- Requests to the public [Jikan API](https://jikan.moe/) (an unofficial MyAnimeList API) when searching titles or fetching cover art
+* Title
+* Status
+* Score
+* Episodes
+* Genres
 
-Clearing your browser data will erase your list, so export a backup periodically if it matters to you.
+If some posters are missing after importing, open **Settings (⚙)** and select **Fetch Missing Covers**.
 
-## Tech
 
-Plain HTML, CSS, and JavaScript — no framework, no build step, no dependencies to install. Fonts are M PLUS Rounded 1c (UI) and Shippori Mincho (accents), loaded from Google Fonts.
+## 🔒 Privacy
 
-## Design
+Your data never leaves your device.
 
-Neo-Japanese minimal: night-sky backdrop, drifting sakura petals, warm vermillion + gold accents against deep ink tones. Poster-forward cards, restrained palette, room to breathe.
+Ichiran stores everything in your browser using **localStorage**.
 
-## License
+The only network requests made are to the **Jikan API**, which is used for searching anime and retrieving poster artwork.
 
-MIT — do whatever you'd like with it.
+If you clear your browser data, your watchlist will be removed, so exporting occasional backups is recommended.
+
+
+## 🛠 Tech Stack
+
+* HTML5
+* CSS3
+* Vanilla JavaScript
+* Jikan API
+* LocalStorage
+
+**Fonts**
+
+* M PLUS Rounded 1c
+* Shippori Mincho
+
+
+## 🎨 Design Philosophy
+
+Inspired by modern Japanese minimalism, Ichiran combines a calm night-sky aesthetic with subtle sakura petals, warm vermillion highlights and clean typography.
+
+The interface stays out of the way so the focus remains on your anime collection.
+
+
+## 📄 License
+
+Released under the **MIT License**.
+
+Feel free to use it, modify it and build upon it.
+
+
+## ⭐ Support
+
+If you enjoy the project, consider giving it a **⭐ on GitHub**.
+
+It helps more than you might think 😊
