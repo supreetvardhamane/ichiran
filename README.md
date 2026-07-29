@@ -1,4 +1,4 @@
-# 🌸 桜 Ichiran (一覧)
+# ⛩️ 桜 Ichiran (一覧)
 
 > **A calm, minimal anime watchlist that lives entirely in your browser.**
 
